@@ -1,0 +1,226 @@
+#include<LedControl.h>
+#include<CapacitiveSensor.h>
+//觸碰
+CapacitiveSensor cs_7_8 =CapacitiveSensor(7,8);
+CapacitiveSensor cs_7_9 =CapacitiveSensor(7,9);
+
+
+#define DIN 2
+#define CS 3
+#define CLK 4
+LedControl lc = LedControl(DIN,CLK,CS,2);
+long randNumber;
+byte mouth[16]={
+  //笑臉
+  //part 1 //0 //右
+    B00000000,
+    B00000000,
+    B00000011,
+    B00000111,
+    B00001000,
+    B00000000,
+    B00000000,
+    B00000000,
+    //part 2 //1 //左
+    B00000000,
+    B00000000,
+    B00000000,
+    B00001000,
+    B00000111,
+    B00000011,
+    B00000000,
+    B00000000,
+};
+byte sad[16]={
+  //哭臉
+  //part 1 //0
+    B00000000,
+    B00000000,
+    B00001000,
+    B00000111,
+    B00000011,
+    B00000000,
+    B00000000,
+    B00000000,
+    //part 2 //1
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000011,
+    B00000111,
+    B00001000,
+    B00000000,
+    B00000000,
+};
+byte tongue[16]={
+  //part 1 //0 //吐舌頭
+    B00000000,
+    B00000001,
+    B00000010,
+    B00000100,
+    B00001001,
+    B11111111,
+    B00000000,
+    B00000000,
+
+     //part 2 //0
+    B00000000,
+    B00000000,
+    B01111111,
+    B00000100,
+    B00001001,
+    B00010010,
+    B00100100,
+    B00111111,
+};
+byte stroll[32]={
+  //part 1 //0
+    B01000100,
+    B00101000,
+    B00010000,
+    B01010100,
+    B00111000,
+    B00010000,
+    B00111000,
+    B00111000,
+    //2
+    B00111000,
+    B00111000,
+    B00010000,
+    B00111000,
+    B01010100,
+    B00010000,
+    B00101000,
+    B01000100,
+    //3
+    B00000000,
+    B00010000,
+    B00010000,
+    B00010000,
+    B00010000,
+    B00010000,
+    B00010000,
+    B00010000,
+    //4
+    B00000000,
+    B00010000,
+    B00111000,
+    B00111000,
+    B00010000,
+    B00010000,
+    B00101000,
+    B00101000,
+};
+byte walk[32]={
+  //part 1 //0
+    B00111000,
+    B00111000,
+    B00010000,
+    B00111000,
+    B01010100,
+    B00010000,
+    B00101000,
+    B01000100,
+    //2
+    B00111000,
+    B00111000,
+    B00010000,
+    B00011000,
+    B00110100,
+    B01010000,
+    B00101000,
+    B00100100,
+    //3
+    B00111000,
+    B00111000,
+    B00010000,
+    B00010000,
+    B00010000,
+    B00010000,
+    B00010000,
+    B00010000,
+    //4
+    B00111000,
+    B00111000,
+    B00010000,
+    B00110000,
+    B01011000,
+    B00010100,
+    B00101000,
+    B01001000,
+};
+
+
+
+void setup() 
+{
+cs_7_8.set_CS_AutocaL_Millis(0xFFFFFFF);
+cs_7_9.set_CS_AutocaL_Millis(0xFFFFFFF);
+  
+  Serial.begin(9600);
+ randomSeed(analogRead(0));
+  //設定正常運作模式
+ lc.shutdown(0,false);
+  lc.shutdown(1,false);
+ //亮度
+lc.setIntensity(0,1);
+lc.setIntensity(1,1);
+ //清除DSP
+ lc.clearDisplay(0);
+ lc.clearDisplay(1);
+ 
+}
+
+void loop()
+{
+//觸碰
+long total1=cs_7_8.capacitiveSensor(50);
+long start=millis();
+Serial.println(total1);
+
+
+  /*randNumber=random(10);
+  Serial.println(randNumber);*/ //隨機變數
+ // while(true)
+
+  for(int i =0;i<=8;i++)
+  {
+    lc.setColumn(1,7-i,mouth[i+8]);
+    lc.setColumn(0,7-i,mouth[i]);
+  }
+  delay(500);
+  for(int i =0;i<=8;i++)
+  {
+    lc.setColumn(1,7-i,sad[i+8]);
+    lc.setColumn(0,7-i,sad[i]);
+  }
+   delay(500);
+   for(int i =0;i<=8;i++)
+  {
+    lc.setColumn(1,7-i,tongue[i+8]);
+    lc.setColumn(0,7-i,tongue[i]);
+  }
+   delay(500);
+  /* //走路
+  for(int i =0;i<=8;i++)
+  {
+    lc.setColumn(1,7-i,walk[i]);
+  }
+  delay(100);
+for(int i =0;i<=8;i++)
+  {
+    lc.setColumn(1,7-i,walk[i+8]);
+  }
+delay(100);
+for(int i =0;i<=8;i++)
+  {
+    lc.setColumn(1,7-i,walk[i+16]);
+  }
+delay(100);
+for(int i =0;i<=8;i++)
+  {
+    lc.setColumn(1,7-i,walk[i+24]);
+  }
+delay(100);
+  */
+}
