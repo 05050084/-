@@ -1,0 +1,402 @@
+#include<LedControl.h>
+#include<CapacitiveSensor.h>
+#include <Ultrasonic.h>
+//觸碰
+CapacitiveSensor cs_7_8 =CapacitiveSensor(A0,A1);
+//CapacitiveSensor cs_7_9 =CapacitiveSensor(7,9);
+
+Ultrasonic ultrasonic(A4,A5); // (Trig PIN,Echo PIN)
+
+#define DIN 2
+#define CS 3
+#define CLK 4
+int touch =1;
+
+
+#define PinMotor1 6
+#define PinMotor2 5
+#define PinMotor3 10
+#define PinMotor4 11
+
+void cry();
+void caninetooth();
+void strolls();
+void tongues();
+void os();
+void smiles();
+
+
+LedControl lc = LedControl(DIN,CLK,CS,2);
+long randNumber;
+byte smile[16]={
+  //哭臉
+  //左 0
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000011,
+    B00000111,
+    B00001100,
+    B00001000,
+    B00000000,
+  //1 //右 //上下顛倒  左右相反
+    B00000000,
+    B00001000,
+    B00001100,
+    B00000111,
+    B00000011,
+    B00000000,
+    B00000000,
+    B00000000,
+};
+byte sad[16]={
+  //笑臉 
+  //左 0
+    B00000000,
+    B00000000,
+    B00001000,
+    B00001100,
+    B00000111,
+    B00000011,
+    B00000000,
+    B00000000,
+    //右 //1  //上下顛倒  左右相反
+    B00000000,
+    B00000000,
+    B00000011,
+    B00000111,
+    B00001100,
+    B00001000,
+    B00000000,
+    B00000000,
+};
+byte tongue[16]={
+  //吐舌頭
+  //左 0
+    B00000000,
+    B00000000,
+    B01111111,
+    B00000100,
+    B00001000,
+    B00010001,
+    B00100010,
+    B01111111,
+
+     //右 //1 //上下顛倒  左右相反
+    B00000011,
+    B00000100,
+    B00001000,
+    B00010001,
+    B00100010,
+    B11111111,
+    B00000000,
+    B00000000,
+};
+byte o[16]={
+  //O嘴
+  //左0 
+    B00000000,
+    B00000000,
+    B00000011,
+    B00000100,
+    B00000100,
+    B00000100,
+    B00000011,
+    B00000000,
+
+     //右 //1 //上下顛倒 左右相反
+    B00000000,
+    B00000011,
+    B00000100,
+    B00000100,
+    B00000100,
+    B00000011,
+    B00000000,
+    B00000000,
+};
+byte mm[16]={
+  //W嘴
+  //左0 
+    B00000000,
+    B00000000,
+    B00000000,
+    B00010000,
+    B00100001,
+    B00100010,
+    B00011100,
+    B00000000,
+
+     //右 //1 //上下顛倒 左右相反
+    B00000000,
+    B00011100,
+    B00100010,
+    B00100001,
+    B00010000,
+    B00000000,
+    B00000000,
+    B00000000,
+};
+byte v[16]={
+  //B嘴
+  //左0 
+    B00000000,
+    B00000000,
+    B00000001,
+    B00000000,
+    B00000001,
+    B00000000,
+    B00000001,
+    B00000000,
+
+     //右 //1 //上下顛倒 左右相反
+    B00011111,
+    B00100000,
+    B00011111,
+    B00000001,
+    B00011111,
+    B00100000,
+    B00011111,
+    B00000000,
+};
+
+
+
+
+byte stroll[32]={
+  //走路
+  //左 //0
+    B00111000,
+    B00111000,
+    B00010000,
+    B00111000,
+    B01010100,
+    B00010000,
+    B00101000,
+    B01000100,
+    //2
+    B00111000,
+    B00111000,
+    B00010000,
+    B00111000,
+    B01011000,
+    B00010000,
+    B00101000,
+    B00100100,
+    //3
+    B00111000,
+    B00111000,
+    B00010000,
+    B00111000,
+    B00010000,
+    B00010000,
+    B00010000,
+    B00010000,
+    //4
+    B00111000,
+    B00111000,
+    B00010000,
+    B00111000,
+    B00110100,
+    B00010000,
+    B00101000,
+    B01001000,
+};
+byte walk[32]={
+  //走路
+  //右  //0 //上下顛倒
+    B01000100,
+    B00101000,
+    B00010000,
+    B01010100,
+    B00111000,
+    B00010000,
+    B00111000,
+    B00111000,
+    //2
+    B01001000,
+    B00101000,
+    B00010000,
+    B01011000,
+    B00111000,
+    B00010000,
+    B00111000,
+    B00111000,
+    //3
+    B00010000,
+    B00010000,
+    B00010000,
+    B01010100,
+    B00111000,
+    B00010000,
+    B00111000,
+    B00111000,
+    //4
+    B00101000,
+    B00101000,
+    B00010000,
+    B00110100,
+    B00111000,
+    B00010000,
+    B00111000,
+    B00111000,
+};
+
+
+
+void setup() 
+{
+cs_7_8.set_CS_AutocaL_Millis(0xFFFFFFF);
+//cs_7_9.set_CS_AutocaL_Millis(0xFFFFFFF);
+  
+  Serial.begin(9600);
+ randomSeed(analogRead(0));
+  //設定正常運作模式
+ lc.shutdown(0,false);
+  lc.shutdown(1,false);
+ //亮度
+lc.setIntensity(0,1);
+lc.setIntensity(1,1);
+ //清除DSP
+ lc.clearDisplay(0);
+ lc.clearDisplay(1);
+ pinMode(PinMotor1, OUTPUT);
+    pinMode(PinMotor2, OUTPUT);
+    pinMode(PinMotor3, OUTPUT);
+    pinMode(PinMotor4, OUTPUT);
+}
+
+void loop()
+{
+//觸碰
+long total=cs_7_8.capacitiveSensor(50);
+long start=millis();
+Serial.println(total);
+/////////////////////////////
+  strolls();//走路
+   /////////////////////////
+if(total>2500)
+{
+  touch++;
+  delay(250);
+
+if(touch==6)
+ {
+  touch=1;
+ }
+/*randNumber=random(10);
+Serial.println(randNumber);//隨機變數*/
+//////////////////////////////////////////////////////////
+if(touch==3)
+{
+     cry();//哭臉
+}
+////////////////////////////////////////////////////////////
+else if(touch==1)
+ {
+     smiles();//笑臉
+ }
+ /////////////////////////////////////////////////////////
+else if(touch==2)
+ {
+     tongues(); //舌頭
+ }
+//////////////////////////////////////////////////////////
+else if(touch==4)
+{
+     os();//哭臉
+}
+//////////////////////////////////////////////////////////
+else if(touch==5)
+{
+     caninetooth();   //尖牙
+}
+///////////////////////////////////////////////////////////
+/* else if(touch==6)
+ {
+   os();//舌頭
+}*/
+}
+/////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////
+ /*analogWrite(PinMotor1,120);
+    analogWrite(PinMotor2,0);
+    analogWrite(PinMotor3,120);
+    analogWrite(PinMotor4,0);*/
+    Serial.print(ultrasonic.Ranging(CM)); // CM or INC
+  Serial.println(" cm" );
+  delay(100);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void smiles()
+{
+    for(int i =0;i<=8;i++)
+    {
+      lc.setColumn(1,7-i,smile[i+8]);
+      lc.setColumn(0,7-i,smile[i]);
+    }
+    delay(1000);
+}
+void os()
+{
+    for(int i =0;i<=8;i++)
+    {
+      lc.setColumn(1,7-i,o[i+8]);
+      lc.setColumn(0,7-i,o[i]);
+    }
+    delay(1000);
+}
+void caninetooth()
+{
+   for(int i =0;i<=8;i++)
+   {
+      lc.setColumn(1,7-i,mm[i+8]);
+      lc.setColumn(0,7-i,mm[i]);
+   }
+   delay(1000);
+}
+
+void tongues()
+{
+     for(int i =0;i<=8;i++)
+     {
+         lc.setColumn(1,7-i,tongue[i+8]);
+         lc.setColumn(0,7-i,tongue[i]);
+     }
+     delay(1000);
+}
+void cry()
+{
+    for(int i =0;i<=8;i++)
+    {
+        lc.setColumn(1,7-i,sad[i+8]);
+        lc.setColumn(0,7-i,sad[i]);
+    }
+    delay(1000);
+}
+void strolls()
+{
+   for(int i =0;i<=8;i++)
+   {
+      lc.setColumn(1,7-i,walk[i]);
+      lc.setColumn(0,7-i,stroll[i]);
+   }
+   delay(50);
+  for(int i =0;i<=8;i++)
+  {
+      lc.setColumn(1,7-i,walk[i+8]);
+      lc.setColumn(0,7-i,stroll[i+8]);
+  }
+  delay(50); 
+  for(int i =0;i<=8;i++)
+  {
+      lc.setColumn(1,7-i,walk[i+16]);
+      lc.setColumn(0,7-i,stroll[i+16]);
+  }
+  delay(50);
+  for(int i =0;i<=8;i++)
+  {
+     lc.setColumn(1,7-i,walk[i+24]);
+     lc.setColumn(0,7-i,stroll[i+24]);
+  }
+}
